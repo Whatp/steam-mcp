@@ -11,7 +11,11 @@
                 "get_steam_review",
                 "search_steam_game"
             ],
-            "description": "Steam游戏评论获取MCP工具"
+            "description": "Steam游戏评论获取MCP工具(带代理)",
+            "env": {
+                "HTTP_PROXY": "http://127.0.0.1:7890",
+                "HTTPS_PROXY": "http://127.0.0.1:7890"
+            }
         }
     }
 }

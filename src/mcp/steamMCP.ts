@@ -4,9 +4,24 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import axios from 'axios';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 const STEAM_API_BASE = "https://store.steampowered.com/";
 const USER_AGENT = "steam-mcp/1.0";
+
+// 代理配置
+const PROXY_URL = process.env.HTTP_PROXY || process.env.HTTPS_PROXY || 'http://127.0.0.1:7890';
+const agent = new HttpsProxyAgent(PROXY_URL);
+
+// 配置axios使用代理
+const axiosInstance = axios.create({
+  httpsAgent: agent,
+  timeout: 30000,
+  headers: {
+    'User-Agent': USER_AGENT
+  }
+});
 
 // 清理评论文本的辅助函数
 function cleanReviewText(text: string): string {
@@ -201,15 +216,13 @@ export class SteamMCP {
       reviewsUrl.searchParams.append("purchase_type", purchase_type);
       reviewsUrl.searchParams.append("num_per_page", num_per_page.toString());
       
-      const reviewsResponse = await fetch(reviewsUrl, {
-        headers: { "User-Agent": USER_AGENT }
-      });
+      const reviewsResponse = await axiosInstance.get(reviewsUrl.toString());
       
-      if (!reviewsResponse.ok) {
+      if (reviewsResponse.status !== 200) {
         throw new Error(`获取评论失败: ${reviewsResponse.statusText}`);
       }
       
-      const reviewsData = await reviewsResponse.json();
+      const reviewsData = reviewsResponse.data;
       
       // 提取评论信息
       const game_reviews = {
@@ -225,15 +238,13 @@ export class SteamMCP {
       const infoUrl = new URL("api/appdetails", STEAM_API_BASE);
       infoUrl.searchParams.append("appids", appid);
       
-      const infoResponse = await fetch(infoUrl, {
-        headers: { "User-Agent": USER_AGENT }
-      });
+      const infoResponse = await axiosInstance.get(infoUrl.toString());
       
-      if (!infoResponse.ok) {
+      if (infoResponse.status !== 200) {
         throw new Error(`获取游戏信息失败: ${infoResponse.statusText}`);
       }
       
-      const infoData = await infoResponse.json();
+      const infoData = infoResponse.data;
       
       // 提取游戏信息
       const game_info = {
@@ -272,22 +283,20 @@ export class SteamMCP {
       searchUrl.searchParams.append("inlibrary", "0");
       searchUrl.searchParams.append("sort_by", "Relevance");
       
-      const response = await fetch(searchUrl, {
-        headers: { "User-Agent": USER_AGENT }
-      });
+      const response = await axiosInstance.get(searchUrl.toString());
       
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`搜索失败: ${response.statusText}`);
       }
       
-      const html = await response.text();
+      const html = response.data;
       
       // 简单的HTML解析来提取游戏信息
       const games: any[] = [];
       const gameMatches = html.match(/data-ds-appid="(\d+)"[^>]*>[\s\S]*?<div[^>]*class="[^"]*search_name[^"]*"[^>]*>[\s\S]*?<span[^>]*class="[^"]*title[^"]*"[^>]*>([^<]+)<\/span>/g);
       
       if (gameMatches) {
-        gameMatches.forEach(match => {
+        gameMatches.forEach((match: string) => {
           const appIdMatch = match.match(/data-ds-appid="(\d+)"/);
           const titleMatch = match.match(/<span[^>]*class="[^"]*title[^"]*"[^>]*>([^<]+)<\/span>/);
           
