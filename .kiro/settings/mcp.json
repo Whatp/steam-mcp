@@ -1,0 +1,17 @@
+{
+    "mcpServers": {
+        "steam": {
+            "command": "node",
+            "args": [
+                "dist/index.js"
+            ],
+            "cwd": "D:/Others/somethingFun/steamMCP",
+            "disabled": false,
+            "autoApprove": [
+                "get_steam_review",
+                "search_steam_game"
+            ],
+            "description": "Steam游戏评论获取MCP工具"
+        }
+    }
+}
