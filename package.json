@@ -1,0 +1,50 @@
+{
+  "name": "steam-mcp",
+  "version": "1.0.0",
+  "description": "Steam评论获取MCP工具",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "steam-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "jest",
+    "prepublishOnly": "npm run build",
+    "postinstall": "npm run build"
+  },
+  "keywords": ["steam", "mcp", "comments", "reviews", "model-context-protocol", "ai-tools"],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/steam-mcp.git"
+  },
+  "homepage": "https://github.com/yourusername/steam-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/yourusername/steam-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ]
+}
